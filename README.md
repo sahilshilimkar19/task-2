@@ -21,7 +21,6 @@ This satisfies all constraints mentioned in the assignment.
 
 ### ✅ User Dashboard (Public)
 Deployed on Vercel  
-URL: <PASTE_USER_DASHBOARD_URL>
 
 Users can:
 - Select rating (1–5)
@@ -33,7 +32,7 @@ Users can:
 
 ### ✅ Admin Dashboard (Internal)
 Deployed on Vercel  
-URL: <PASTE_ADMIN_DASHBOARD_URL>
+
 
 Admins can:
 - View all submissions
@@ -46,7 +45,7 @@ Admins can:
 
 ### ✅ Backend API
 Deployed on Render  
-URL: <PASTE_BACKEND_RENDER_URL>
+
 
 Backend exposes:
 - POST `/submit-review`
