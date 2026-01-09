@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>User Feedback</title>
+  <style>
+    body {
+      background: #0f172a;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: #e5e7eb;
+    }
+
+    .card {
+      background: #020617;
+      padding: 30px;
+      border-radius: 12px;
+      width: 350px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #38bdf8;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    select, textarea {
+      width: 100%;
+      margin-top: 5px;
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      background: #0f172a;
+      color: white;
+      resize: none;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 10px;
+      background: #38bdf8;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #0ea5e9;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #a7f3d0;
+      min-height: 40px;
+    }
+
+    .error {
+      color: #fca5a5;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Share Your Feedback</h2>
+
+  <label>Rating</label>
+  <select id="rating">
+    <option value="1">⭐ 1</option>
+    <option value="2">⭐ 2</option>
+    <option value="3">⭐ 3</option>
+    <option value="4">⭐ 4</option>
+    <option value="5">⭐ 5</option>
+  </select>
+
+  <label>Review</label>
+  <textarea id="review" rows="4" placeholder="Write your experience..."></textarea>
+
+  <button onclick="submitReview()">Submit</button>
+
+  <p id="result"></p>
+</div>
+
+<script>
+// REPLACE THIS with your Render backend URL after deployment
+const API_URL = "https://llm-back-b15p.onrender.com";
+
+async function submitReview() {
+  const rating = document.getElementById("rating").value;
+  const review = document.getElementById("review").value;
+  const result = document.getElementById("result");
+
+  result.innerText = "Submitting...";
+
+  try {
+    const res = await fetch(`${API_URL}/submit-review`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({rating: Number(rating), review})
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      result.innerText = data.ai_response;
+      result.className = "";
+    } else {
+      result.innerText = data.detail || "Submission failed";
+      result.className = "error";
+    }
+  } catch (err) {
+    result.innerText = "Server not reachable";
+    result.className = "error";
+  }
+}
+</script>
+
+</body>
+</html>
