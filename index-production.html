@@ -2,134 +2,116 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>User Feedback</title>
+  <title>Admin Dashboard</title>
+
   <style>
     body {
-      background: #0f172a;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      color: #e5e7eb;
-    }
-
-    .card {
       background: #020617;
-      padding: 30px;
-      border-radius: 12px;
-      width: 350px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      color: #e5e7eb;
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 20px;
       color: #38bdf8;
+      margin-bottom: 25px;
     }
 
-    label {
-      display: block;
-      margin-top: 12px;
-      font-size: 14px;
-      color: #94a3b8;
+    .container {
+      max-width: 900px;
+      margin: auto;
     }
 
-    select, textarea {
-      width: 100%;
-      margin-top: 5px;
-      padding: 8px;
-      border-radius: 6px;
-      border: none;
+    .card {
       background: #0f172a;
-      color: white;
-      resize: none;
+      border-radius: 12px;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
     }
 
-    button {
-      width: 100%;
-      margin-top: 15px;
-      padding: 10px;
-      background: #38bdf8;
-      border: none;
-      border-radius: 8px;
+    .rating {
+      background: #22c55e;
+      color: black;
+      padding: 5px 10px;
+      border-radius: 20px;
+      display: inline-block;
       font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
+      margin-bottom: 8px;
     }
 
-    button:hover {
-      background: #0ea5e9;
-    }
-
-    #result {
-      margin-top: 15px;
+    .section {
+      margin-top: 6px;
       font-size: 14px;
-      color: #a7f3d0;
-      min-height: 40px;
+      color: #cbd5f5;
     }
 
-    .error {
-      color: #fca5a5;
+    .label {
+      color: #94a3b8;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    .refresh {
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 
 <body>
 
-<div class="card">
-  <h2>Share Your Feedback</h2>
+<h2>Admin Dashboard</h2>
+<div class="refresh">Auto-refreshes every 5 seconds</div>
 
-  <label>Rating</label>
-  <select id="rating">
-    <option value="1">⭐ 1</option>
-    <option value="2">⭐ 2</option>
-    <option value="3">⭐ 3</option>
-    <option value="4">⭐ 4</option>
-    <option value="5">⭐ 5</option>
-  </select>
-
-  <label>Review</label>
-  <textarea id="review" rows="4" placeholder="Write your experience..."></textarea>
-
-  <button onclick="submitReview()">Submit</button>
-
-  <p id="result"></p>
-</div>
+<div class="container" id="list"></div>
 
 <script>
 // REPLACE THIS with your Render backend URL after deployment
 const API_URL = "https://llm-back-b15p.onrender.com";
 
-async function submitReview() {
-  const rating = document.getElementById("rating").value;
-  const review = document.getElementById("review").value;
-  const result = document.getElementById("result");
-
-  result.innerText = "Submitting...";
-
+async function loadData() {
   try {
-    const res = await fetch(`${API_URL}/submit-review`, {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({rating: Number(rating), review})
-    });
-
+    const res = await fetch(`${API_URL}/admin/submissions`);
     const data = await res.json();
 
-    if (res.ok) {
-      result.innerText = data.ai_response;
-      result.className = "";
-    } else {
-      result.innerText = data.detail || "Submission failed";
-      result.className = "error";
-    }
+    let html = "";
+    data.forEach(d => {
+      html += `
+        <div class="card">
+          <div class="rating">⭐ ${d.rating}</div>
+
+          <div class="section">
+            <span class="label">Review:</span><br>
+            ${d.review}
+          </div>
+
+          <div class="section">
+            <span class="label">AI Summary:</span><br>
+            ${d.summary}
+          </div>
+
+          <div class="section">
+            <span class="label">Recommended Action:</span><br>
+            ${d.action}
+          </div>
+        </div>
+      `;
+    });
+
+    document.getElementById("list").innerHTML = html;
   } catch (err) {
-    result.innerText = "Server not reachable";
-    result.className = "error";
+    document.getElementById("list").innerHTML =
+      "<p style='color:#fca5a5'>Failed to load data</p>";
   }
 }
+
+loadData();
+setInterval(loadData, 5000);
 </script>
 
 </body>
